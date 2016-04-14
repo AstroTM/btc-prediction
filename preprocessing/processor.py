@@ -1,5 +1,8 @@
 import csv
 
+import numpy as np
+from scipy.io import savemat
+
 from model import Transaction
 
 
@@ -43,21 +46,75 @@ def deserializer(csv_iterable):
             previous_transaction = transaction
 
 
-def serialize(transactions):
+def serialize(transactions, output_filename):
     """
     Convert python to .mat
     """
-    # savemat('input.mat')
-    return transactions
+    x = list()
+    y = list()
+
+    for transaction in transactions:
+        x.append(np.array([
+            transaction.amount,
+            transaction.sell,
+            transaction.asks[0][0],
+            transaction.asks[0][1],
+            transaction.asks[1][0],
+            transaction.asks[1][1],
+            transaction.asks[2][0],
+            transaction.asks[2][1],
+            transaction.asks[3][0],
+            transaction.asks[3][1],
+            transaction.asks[4][0],
+            transaction.asks[4][1],
+            transaction.asks[5][0],
+            transaction.asks[5][1],
+            transaction.asks[6][0],
+            transaction.asks[6][1],
+            transaction.asks[7][0],
+            transaction.asks[7][1],
+            transaction.asks[8][0],
+            transaction.asks[8][1],
+            transaction.asks[9][0],
+            transaction.asks[9][1],
+            transaction.bids[0][0],
+            transaction.bids[0][1],
+            transaction.bids[1][0],
+            transaction.bids[1][1],
+            transaction.bids[2][0],
+            transaction.bids[2][1],
+            transaction.bids[3][0],
+            transaction.bids[3][1],
+            transaction.bids[4][0],
+            transaction.bids[4][1],
+            transaction.bids[5][0],
+            transaction.bids[5][1],
+            transaction.bids[6][0],
+            transaction.bids[6][1],
+            transaction.bids[7][0],
+            transaction.bids[7][1],
+            transaction.bids[8][0],
+            transaction.bids[8][1],
+            transaction.bids[9][0],
+            transaction.bids[9][1],
+            transaction.d_high,
+            transaction.d_low,
+            transaction.d_vwap,
+            transaction.d_volume
+        ]))
+
+        y.append(transaction.price)
+
+    savemat(output_filename, dict(x=np.array(x), y=np.array(y)))
 
 
-def process(file_name):
+def process(input_filename, output_filename):
     """
     Process csv file and write two separate X and Y .mat files
     """
     transactions = []
 
-    with open(file_name, 'rb') as f:
+    with open(input_filename, 'rb') as f:
         file_has_header = csv.Sniffer().has_header(f.read(1024))
         f.seek(0)
         csv_iterator = csv.reader(f)
@@ -71,7 +128,6 @@ def process(file_name):
             if transaction:
                 transactions.append(transaction)
 
-    return serialize(transactions)
-
+    return serialize(sorted(transactions, key=lambda tran: tran.id), output_filename)
 
 

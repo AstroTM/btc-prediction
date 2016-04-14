@@ -7,4 +7,4 @@ from preprocessing import processor
 
 
 if __name__ == '__main__':
-    result = processor.process(sys.argv[1])
+    result = processor.process(sys.argv[1], sys.argv[2])
